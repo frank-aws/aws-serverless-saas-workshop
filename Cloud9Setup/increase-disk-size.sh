@@ -3,9 +3,12 @@
 # Specify the desired volume size in GiB as a command line argument. If not specified, default to 50 GiB.
 SIZE=50
 
+# generate token to access instance metadata
+TOKEN=$(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 5")
+
 # Get the ID of the environment host Amazon EC2 instance.
-INSTANCEID=$(curl http://169.254.169.254/latest/meta-data/instance-id)
-REGION=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone | sed 's/\(.*\)[a-z]/\1/')
+INSTANCEID=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/instance-id)
+REGION=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/placement/availability-zone | sed 's/\(.*\)[a-z]/\1/')
 
 # Get the ID of the Amazon EBS volume associated with the instance.
 VOLUMEID=$(aws ec2 describe-instances \
@@ -34,10 +37,11 @@ then
   sudo growpart /dev/xvda 1
 
   # Expand the size of the file system.
-  # Check if we're on AL2
+  # Check if we're on AL2 or AL2023
   STR=$(cat /etc/os-release)
-  SUB="VERSION_ID=\"2\""
-  if [[ "$STR" == *"$SUB"* ]]
+  AL2="VERSION_ID=\"2\""
+  AL2023="VERSION_ID=\"2023\""
+  if [[ "$STR" =~ "$AL2"|"$AL2023" ]]
   then
     sudo xfs_growfs -d /
   else
@@ -51,8 +55,9 @@ else
   # Expand the size of the file system.
   # Check if we're on AL2
   STR=$(cat /etc/os-release)
-  SUB="VERSION_ID=\"2\""
-  if [[ "$STR" == *"$SUB"* ]]
+  AL2="VERSION_ID=\"2\""
+  AL2023="VERSION_ID=\"2023\""
+  if [[ "$STR" =~ "$AL2"|"$AL2023" ]]
   then
     sudo xfs_growfs -d /
   else
