@@ -31,13 +31,13 @@ if [[ $IS_AL2023 == true ]]; then
 	DNF_HEADER=$(head -1 /usr/bin/dnf)
 	PYTH3_HEADER=$'#!/usr/bin/python3'
 	if [[ "$YUM_HEADER" == "$PYTH3_HEADER" ]]; then
-		echo "Changing python interpreter for yum to system python3.12"
-		sudo sed -i 's|#!/usr/bin/python3|#!/usr/bin/python3.12|g' /usr/bin/yum
+		echo "Changing python interpreter for yum to system Python3.9"
+		sudo sed -i 's|#!/usr/bin/python3|#!/usr/bin/python3.9|g' /usr/bin/yum
 	fi
 
 	if [[ "$DNF_HEADER" == "$PYTH3_HEADER" ]]; then
-		echo "Changing python interpreter for dnf to system python3.12"
-		sudo sed -i 's|#!/usr/bin/python3|#!/usr/bin/python3.12|g' /usr/bin/dnf
+		echo "Changing python interpreter for dnf to system Python3.9"
+		sudo sed -i 's|#!/usr/bin/python3|#!/usr/bin/python3.9|g' /usr/bin/dnf
 	fi
 fi
 
